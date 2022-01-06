@@ -1,13 +1,7 @@
 const Vesting = artifacts.require("Vesting");
 const Token = artifacts.require("Token");
 const { expectRevert,time } = require('@openzeppelin/test-helpers');
-const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
-/*
- * uncomment accounts to access the test accounts made available by the
- * Ethereum client
- * See docs: https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
- */
 contract("Vesting", function ( accounts ) {
   
   let vesting

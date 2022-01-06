@@ -23,6 +23,9 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+const path = require("path");
+
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -33,6 +36,7 @@ module.exports = {
    *
    * $ truffle test --network <network-name>
    */
+  contracts_build_directory: path.join(__dirname, "src/contracts"),
 
   networks: {
     // Useful for testing. The `development` name is special - truffle uses it by default
