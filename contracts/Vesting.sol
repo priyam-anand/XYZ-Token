@@ -48,6 +48,7 @@ contract Vesting {
     function addAddresses(address[] memory _accounts) public onlyAdmin {
         require(_accounts.length == 10, "Exactly 10 accounts are allowed");
         require(accounts.length == 0,"Accounts already set");
+        require(tokenAddress != address(0), "Token Address is not set");
         for (uint256 i = 0; i < _accounts.length; i++) {
             accounts.push(_accounts[i]);
         }

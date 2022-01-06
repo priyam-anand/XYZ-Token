@@ -15,7 +15,7 @@ const App = () => {
   const [accounts, setAccounts] = useState(undefined);
   const [allAccounts, setAllAccounts] = useState([]);
   const [isAccountSet, setIsAccountSet] = useState(undefined);
-
+  const [tokenAddress,setTokenAddress] = useState(undefined);
 
   const isReady = () => {
     return (
@@ -47,6 +47,7 @@ const App = () => {
       const isAccSet = await vestingContract.methods.isAccountsSet().call();
 
       setWeb3(web3);
+      setTokenAddress(tokenNetwork.address);
       setAccounts(accounts);
       setVesting(vestingContract);
       setToken(tokenContract);
@@ -54,6 +55,28 @@ const App = () => {
     }
     init();
   }, [])
+
+  useEffect(()=>{
+    const getAdd = async () => {
+      const data = await vesting.methods.getAddresses().call();
+      console.log(data);
+      setAllAccounts(data);
+    }
+    if(isAccountSet)
+    {
+      getAdd();
+    }
+  },[isAccountSet])
+
+  const addTokenAddress = async (e) => {
+    e.preventDefault();
+    await vesting.methods.setTokenAddress(tokenAddress).send({from:accounts[0]});
+  }
+
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    await vesting.methods.withdraw().send({from:accounts[0]});
+  }
 
   if (!isReady()) {
     return <Loading />;
@@ -70,11 +93,11 @@ const App = () => {
           : (
             <>
               <div className="container set-token my-2">
-                <button className='btn btn-primary btn-lg'>
+                <button className='btn btn-primary btn-lg' onClick={addTokenAddress}>
                   Initialize
                 </button>
               </div>
-              <Add />
+              <Add vesting={vesting} account={accounts[0]} setIsAccountSet={setIsAccountSet}/>
             </>
           )
       }
@@ -84,13 +107,16 @@ const App = () => {
           (<>
             <div className="container mt-4">
               <div className="row">
-                <Card />
-                <Card /><Card /><Card /><Card /><Card />
+                {
+                  allAccounts.map((data,index) => {
+                  return <Card data={data} token={token} key={index} web3={web3}/>
+                })
+                }
               </div>
             </div>
 
             <div className="container set-token my-2">
-              <button className='btn btn-primary btn-lg'>
+              <button className='btn btn-primary btn-lg' onClick={handleWithdraw}>
                 Withdraw
               </button>
             </div>
