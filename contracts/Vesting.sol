@@ -29,14 +29,25 @@ contract Vesting {
     function getLastPayout() public view returns (uint256) {
         return lastPayout;
     }
-    
+    function getAddresses() public view returns (address[] memory){
+        return accounts;
+    }
+
+
+    function isAccountsSet() public view returns(bool){
+        return accounts.length == 10;
+    }
+
     function setTokenAddress(address _tokenAddress) public onlyAdmin{
-      tokenAddress = _tokenAddress;
-      payout = ERC20(_tokenAddress).totalSupply() / 525600;
+        require(_tokenAddress != address(0),"token address cannot be 0");
+        require(tokenAddress == address(0),"token address is already set");
+        tokenAddress = _tokenAddress;
+        payout = ERC20(_tokenAddress).totalSupply() / 525600;
     }
 
     function addAddresses(address[] memory _accounts) public onlyAdmin {
         require(_accounts.length == 10, "Exactly 10 accounts are allowed");
+        require(accounts.length == 0,"Accounts already set");
         for (uint256 i = 0; i < _accounts.length; i++) {
             accounts.push(_accounts[i]);
         }
