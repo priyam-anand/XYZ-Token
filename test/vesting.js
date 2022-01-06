@@ -26,6 +26,7 @@ contract("Vesting", function ( accounts ) {
   })
 
   it("should add accounts", async() => {
+    await vesting.setTokenAddress(token.address,{from:accounts[0]});
     await vesting.addAddresses(accounts,{from:accounts[0]})
     const data = await vesting.getAccounts();
     for(let i=0;i<10;i++)
@@ -40,6 +41,7 @@ contract("Vesting", function ( accounts ) {
   });
 
   it("should not withdraw if enough time has not passed", async () => {
+    await vesting.setTokenAddress(token.address,{from:accounts[0]});
     await vesting.addAddresses(accounts,{from:accounts[0]});
     await expectRevert(
       vesting.withdraw({from:accounts[0]})
@@ -47,19 +49,19 @@ contract("Vesting", function ( accounts ) {
     );
   });
 
-  it("should not withdraw if token address not given", async() => {
-    await vesting.addAddresses(accounts,{from:accounts[0]});
-    await time.increase(65);
+  // it("should not withdraw if token address not given", async() => {
+  //   await vesting.addAddresses(accounts,{from:accounts[0]});
+  //   await time.increase(65);
 
-    await expectRevert(
-      vesting.withdraw({from:accounts[0]})
-      , "No token address specified"
-    )
-  })
+  //   await expectRevert(
+  //     vesting.withdraw({from:accounts[0]})
+  //     , "No token address specified"
+  //   )
+  // })
 
   it("should withdraw",async () => {
-    await vesting.addAddresses(accounts,{from:accounts[0]});
     await vesting.setTokenAddress(token.address,{from:accounts[0]});
+    await vesting.addAddresses(accounts,{from:accounts[0]});
     
     const previousBal1 = await token.balanceOf(accounts[1]);
     const previousBal2 = await token.balanceOf(accounts[2]);
@@ -72,5 +74,33 @@ contract("Vesting", function ( accounts ) {
 
     assert((currBal1.sub(previousBal1)).toString() === "190258751902587519025");
     assert((currBal2.sub(previousBal2)).toString() === "190258751902587519025");
+  });
+
+  it("should withdraw muliple times", async () => {
+    await vesting.setTokenAddress(token.address,{from:accounts[0]});
+    await vesting.addAddresses(accounts,{from:accounts[0]});
+    
+    const previousBal1 = await token.balanceOf(accounts[1]);
+    const previousBal2 = await token.balanceOf(accounts[2]);
+    await time.increase(65);
+
+    await vesting.withdraw({from:accounts[0]});
+
+    const currBal1 = await token.balanceOf(accounts[1]);
+    const currBal2 = await token.balanceOf(accounts[2]);
+
+    assert((currBal1.sub(previousBal1)).toString() === "190258751902587519025");
+    assert((currBal2.sub(previousBal2)).toString() === "190258751902587519025");
+  
+    await time.increase(65);
+
+    await vesting.withdraw({from:accounts[0]});
+    const futureBal1 = await token.balanceOf(accounts[1]);
+    const futureBal2 = await token.balanceOf(accounts[2]);
+
+    assert((futureBal1.sub(currBal1)).toString() === "190258751902587519025");
+    assert((futureBal2.sub(currBal2)).toString() === "190258751902587519025");
+  
+
   })
 });

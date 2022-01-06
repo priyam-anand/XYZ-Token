@@ -16,7 +16,7 @@ const App = () => {
   const [allAccounts, setAllAccounts] = useState([]);
   const [isAccountSet, setIsAccountSet] = useState(undefined);
   const [tokenAddress,setTokenAddress] = useState(undefined);
-
+  const [change,setChange] = useState(1);
   const isReady = () => {
     return (
       typeof token !== 'undefined'
@@ -59,7 +59,6 @@ const App = () => {
   useEffect(()=>{
     const getAdd = async () => {
       const data = await vesting.methods.getAddresses().call();
-      console.log(data);
       setAllAccounts(data);
     }
     if(isAccountSet)
@@ -76,6 +75,7 @@ const App = () => {
   const handleWithdraw = async (e) => {
     e.preventDefault();
     await vesting.methods.withdraw().send({from:accounts[0]});
+    setChange(change * -1);
   }
 
   if (!isReady()) {
@@ -109,7 +109,7 @@ const App = () => {
               <div className="row">
                 {
                   allAccounts.map((data,index) => {
-                  return <Card data={data} token={token} key={index} web3={web3}/>
+                  return <Card data={data} token={token} key={index} web3={web3} change={change}/>
                 })
                 }
               </div>

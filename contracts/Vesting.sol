@@ -32,7 +32,11 @@ contract Vesting {
     function getAddresses() public view returns (address[] memory){
         return accounts;
     }
-
+    function getAmount() public view returns(uint){
+        uint time = block.timestamp - lastPayout;
+        uint amount = time/(1 minutes) * payout;
+        return amount;
+    }
 
     function isAccountsSet() public view returns(bool){
         return accounts.length == 10;
@@ -54,10 +58,11 @@ contract Vesting {
         }
     }
 
+
     function withdraw() public onlyAdmin {
         require(accounts.length == 10, "Accounts have not been set");
         uint256 time = block.timestamp - lastPayout;
-        require(time >= 60, "Not enough time has passed");
+        require(time >= (1 minutes), "Not enough time has passed");
 
         require(tokenAddress != address(0),"No token address specified");
 
@@ -65,7 +70,7 @@ contract Vesting {
 
         require(token.balanceOf(address(this)) > 0, "All payouts have been done");
         // calculate the number of payouts and amount
-        uint256 timeSlots = time / 60;
+        uint256 timeSlots = time / (1 minutes);
         uint256 amount = timeSlots * payout;
         if (amount > token.balanceOf(address(this))) {
             amount = token.balanceOf(address(this));
@@ -77,7 +82,7 @@ contract Vesting {
         }
 
         // update the time of last payout
-        lastPayout = lastPayout + time * 60;
+        lastPayout = lastPayout + timeSlots * (1 minutes);
     }
 
     modifier onlyAdmin() {

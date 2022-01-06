@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-const Card = ({ data, token, web3 }) => {
+const Card = ({ data, token, web3, change }) => {
 
     const [balance, setBalance] = useState(0);
 
@@ -10,7 +10,7 @@ const Card = ({ data, token, web3 }) => {
             setBalance(bal)
         }
         getBal();
-    }, [])
+    }, [change])
 
     return (
         <div className="col-lg-6 my-2">
